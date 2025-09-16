@@ -1,5 +1,7 @@
 package frc.teleOp;
 
+import frc.robot.subsystems.outtake.Outtake;
+
 public class TeleOp {
     private static TeleOp instance;
     private TeleOp() {
@@ -12,9 +14,9 @@ public class TeleOp {
     }
 
     public void init() {
-        System.out.println("TeleOp Init");
+        Outtake.getInstance().init();
     }
     public void loop() {
-        System.out.println("TeleOp Loop");
+        Outtake.getInstance().update();
     }
 }
