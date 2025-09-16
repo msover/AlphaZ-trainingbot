@@ -1,8 +1,10 @@
 package frc.robot.subsystems.outtake;
 
-import frc.robot.utils.Constants;
-import frc.robot.utils.Hardware;
-import frc.robot.utils.PID.Outtake.LiftPID;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.hardware.Hardware;
+import frc.robot.utils.PID.OuttakePID;
+import frc.robot.utils.PID.OuttakePID.LiftPID;
+import frc.robot.utils.constants.Constants;
 import frc.robot.utils.wrappers.Gamepad;
 
 public class Outtake {
@@ -15,22 +17,22 @@ public class Outtake {
         }
         return instance;
     }
-    
-    private void liftAction() {
+    private LiftPID LiftPID = new OuttakePID().new LiftPID(Hardware.Outtake.Lift.liftMotor, Hardware.Outtake.Lift.liftEncoder);
+    private void setLiftState() {
         //Placeholder values
-        if(Gamepad.getInstance().get1().getAButton()) {
+        if(Gamepad.get1().getAButton()) {
             Hardware.Outtake.Lift.targetPos = Constants.Outtake.Lift.liftUp;
         }
-        if(Gamepad.getInstance().get1().getBButton()) {
+        if(Gamepad.get1().getBButton()) {
             Hardware.Outtake.Lift.targetPos = Constants.Outtake.Lift.liftDown;
         }
     }
     public void init() {
         Hardware.Outtake.Lift.targetPos = Constants.Outtake.Lift.liftDown;
-        LiftPID.init();
     }
     public void update() {
-        LiftPID.update(Hardware.Outtake.Lift.liftMotor, Hardware.Outtake.Lift.liftEncoder, Hardware.Outtake.Lift.targetPos);
-        liftAction();
+        LiftPID.update(Hardware.Outtake.Lift.targetPos);
+        setLiftState();
+        SmartDashboard.putNumber("lift height", Hardware.Outtake.Lift.liftEncoder.get());
     }
 }
