@@ -1,10 +1,10 @@
 package frc.robot.subsystems.outtake;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.hardware.Hardware;
 import frc.robot.utils.PID.OuttakePID;
 import frc.robot.utils.PID.OuttakePID.LiftPID;
 import frc.robot.utils.constants.Constants;
+import frc.robot.utils.hardware.Hardware;
 import frc.robot.utils.wrappers.Gamepad;
 
 public class Outtake {

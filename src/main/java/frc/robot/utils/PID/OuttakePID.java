@@ -1,18 +1,19 @@
 package frc.robot.utils.PID;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import frc.robot.utils.constants.Constants;
 
 public class OuttakePID {
     public class LiftPID {
         private PIDController controller;
 
-        MotorController motor;
+        TalonFX motor;
         Encoder encoder;
 
-        public LiftPID(MotorController motor, Encoder encoder) {
+        public LiftPID(TalonFX motor, Encoder encoder) {
             this.motor = motor;
             this.encoder = encoder;
             Constants.Outtake.Lift.Fmap.setMap();

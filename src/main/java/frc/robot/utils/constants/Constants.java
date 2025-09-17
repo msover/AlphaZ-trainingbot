@@ -4,15 +4,35 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class Constants {
     public static class Drivetrain {
-        public static class SwerveModule {
-            public static final double angleP = 0.0;
-            public static final double angleI = 0.0;
-            public static final double angleD = 0.0;
+        public static class LeftBack {
+            public static int driveMotorID = 0;
+            public static int steerMotorID = 0;
+            public static int steerEncoderID = 0;
         }
+        public static class LeftFront {
+            public static int driveMotorID = 0;
+            public static int steerMotorID = 0;
+            public static int steerEncoderID = 0;
+        }
+        public static class RightBack {
+            public static int driveMotorID = 0;
+            public static int steerMotorID = 0;
+            public static int steerEncoderID = 0;
+        }
+        public static class RightFront {
+            public static int driveMotorID = 0;
+            public static int steerMotorID = 0;
+            public static int steerEncoderID = 0;
+        }
+        
     }
     public static class Outtake {
         public static class Lift {
-            public static int liftUp = 1;
+            public static int liftMotorID = 0;
+            public static int liftEncoderAID = 0;
+            public static int liftEncoderBID = 0;
+
+            public static int liftUp = 0;
             public static int liftDown = 0;
 
             public static final double p = 0.0;
