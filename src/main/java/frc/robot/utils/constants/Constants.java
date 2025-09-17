@@ -44,8 +44,8 @@ public class Constants {
 
                 public static void setMap() {
                     fMap.put(null, null);
+                    // Add (position, F) pairs to the map
 
-                    // Add (position, F) pairs to the map                    
                     /* fMap.put(null, null);
                     fMap.put(null, null);
                     fMap.put(null, null);
