@@ -8,11 +8,12 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.DeviceConstructor;
 
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.utils.constants.Constants;
+import frc.robot.utils.constants.Constants.Drivetrain.LeftFront;
 
 public class Hardware {
-    public class Drivetrain {
+    /*public class Drivetrain {
         
-        public class LeftBack {
+       public class LeftBack {
             TalonFX driveMotor = new TalonFX(Constants.Drivetrain.LeftBack.driveMotorID);
             TalonFX steerMotor = new TalonFX(Constants.Drivetrain.LeftBack.steerMotorID);
             CANcoder steerEncoder = new CANcoder(Constants.Drivetrain.LeftBack.steerEncoderID);
@@ -62,14 +63,23 @@ public class Hardware {
         }
 
     }
+        */
     public class Intake{
-        
+        public class Pivot {
+            public static TalonFX drive = new TalonFX(Constants.Intake.Pivot.driveId, "canivore");
+            public static TalonFX lift = new TalonFX(Constants.Intake.Pivot.liftId, "canivore");
+        }
+        public class Storage {
+            public static TalonFX left = new TalonFX(Constants.Intake.Storage.leftId, "canivore");
+            public static TalonFX right = new TalonFX(Constants.Intake.Storage.rightId, "canivore");
+        }
     }
     public class Outtake {
         public class Lift {
-            public static TalonFX liftMotor = new TalonFX(Constants.Outtake.Lift.liftMotorID);
-            public static Encoder liftEncoder = new Encoder(Constants.Outtake.Lift.liftEncoderAID, Constants.Outtake.Lift.liftEncoderBID);
-            public static double targetPos;
+            public static TalonFX leftMotor = new TalonFX(Constants.Outtake.Lift.leftMotorId, "canivore");
+            public static TalonFX rightMotor = new TalonFX(Constants.Outtake.Lift.rightMotorId, "canivore");
+            
+            
         }
     }
     

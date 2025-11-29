@@ -26,36 +26,41 @@ public class Constants {
         }
         
     }
+    public static class Intake {
+        public static class Pivot {
+            public static int driveId = 51;
+            public static int liftId = 52;
+        }
+        public static class Storage {
+            public static int leftId = 61;
+            public static int rightId = 62;
+        }
+    }
+
     public static class Outtake {
         public static class Lift {
-            public static int liftMotorID = 0;
-            public static int liftEncoderAID = 0;
-            public static int liftEncoderBID = 0;
+            public static int leftMotorId = 17;
+            public static int rightMotorId = 27;
 
-            public static int liftUp = 0;
-            public static int liftDown = 0;
+            public static double LEFT_IN = 0;
+            public static double RIGHT_IN = 0;
 
-            public static final double p = 0.0;
-            public static final double i = 0.0;
-            public static final double d = 0.0;
+            public static double LEFT_TRANSFER = 1.1;
+            public static double RIGHT_TRANSFER = 1.1;
 
-            public static class Fmap {
-                private static InterpolatingDoubleTreeMap fMap = new InterpolatingDoubleTreeMap();
+            public static double LEFT_SAFE = 3;
+            public static double RIGHT_SAFE = 3;
 
-                public static void setMap() {
-                    fMap.put(null, null);
-                    // Add (position, F) pairs to the map
+            public static double LEFT_SCORE1 = 2.3;
+            public static double RIGHT_SCORE1 = 6;
 
-                    /* fMap.put(null, null);
-                    fMap.put(null, null);
-                    fMap.put(null, null);
-                    fMap.put(null, null); */
-                }
+            public static double LEFT_SCORE2 = 9;
+            public static double RIGHT_SCORE2 = 12;
 
-                public static double getMap(double key) {
-                    return fMap.get(key);
-                }
-            }
+            public static double LEFT_SCORE3 = 12;
+            public static double RIGHT_SCORE3 = 16;
+            
+            
         }
     }
 }
