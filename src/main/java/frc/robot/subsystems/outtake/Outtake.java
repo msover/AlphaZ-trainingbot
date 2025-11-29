@@ -1,5 +1,6 @@
 package frc.robot.subsystems.outtake;
 
+import edu.wpi.first.wpilibj.PS5Controller;
 import frc.robot.subsystems.outtake.lift.Lift;
 
 public class Outtake {
@@ -11,8 +12,8 @@ public class Outtake {
         return instance;
     }
 
-    public void init() {
-        Lift.getInstace().init();
+    public void init(PS5Controller gamepad) {
+        Lift.getInstace().initPID();
     }
     public void update() {
         Lift.getInstace().update();

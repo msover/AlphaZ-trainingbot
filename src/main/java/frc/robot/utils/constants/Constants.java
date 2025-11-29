@@ -60,6 +60,21 @@ public class Constants {
             public static double LEFT_SCORE3 = 12;
             public static double RIGHT_SCORE3 = 16;
             
+            public static double TARGET_ROT = 0;
+            
+            public static double ks = 0;
+            public static double kv = 0;
+            public static double ka = 0;
+            public static double kp = 0;
+            public static double ki = 0;
+            public static double kd = 0;
+            public static double kf = 0;
+
+            
+            public static int cruiseVel = 0;
+            public static int acc = 0;
+            public static int jerk = 0;
+
             
         }
     }
