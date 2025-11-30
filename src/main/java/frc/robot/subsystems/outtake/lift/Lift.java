@@ -1,8 +1,14 @@
 package frc.robot.subsystems.outtake.lift;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -42,8 +48,12 @@ public class Lift {
     private MotionMagicVoltage request;
 
     public void setMotorConfig(TalonFX motor, double ks, double kv, double ka, double kp, double ki, double kd,
-            int magicVel, int magicAcc, int magicJerk) {
+            int magicVel, int magicAcc, int magicJerk, boolean reversed) {
         var motorConfig = new TalonFXConfiguration();
+
+        motorConfig.Voltage.PeakForwardVoltage = 12;
+        motorConfig.Voltage.PeakReverseVoltage = -12;
+
         motorConfig.Slot0.kS = ks;
         motorConfig.Slot0.kV = kv;
         motorConfig.Slot0.kA = ka;
@@ -55,6 +65,20 @@ public class Lift {
         magicConfig.MotionMagicCruiseVelocity = magicVel;
         magicConfig.MotionMagicAcceleration = magicAcc;
         magicConfig.MotionMagicJerk = magicJerk;
+
+        if (reversed) {
+            motorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        } else {
+            motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        }
+
+        //TODO current limits
+        motorConfig.CurrentLimits.withSupplyCurrentLowerLimit(Amps.of(30));
+        motorConfig.CurrentLimits.withSupplyCurrentLimit(Amps.of(40));
+        motorConfig.CurrentLimits.withSupplyCurrentLowerTime(Seconds.of(0.2));
+        motorConfig.CurrentLimits.withSupplyCurrentLimitEnable(true);
+        motorConfig.CurrentLimits.withStatorCurrentLimit(Amps.of(80));
+        motorConfig.CurrentLimits.withStatorCurrentLimitEnable(true);
 
         motor.getConfigurator().apply(motorConfig);
     }
@@ -82,7 +106,8 @@ public class Lift {
                 Constants.Outtake.Lift.kd,
                 Constants.Outtake.Lift.cruiseVel,
                 Constants.Outtake.Lift.acc,
-                Constants.Outtake.Lift.jerk);
+                Constants.Outtake.Lift.jerk,
+                false);
 
         setMotorConfig(
                 right,
@@ -94,7 +119,8 @@ public class Lift {
                 Constants.Outtake.Lift.kd,
                 Constants.Outtake.Lift.cruiseVel,
                 Constants.Outtake.Lift.acc,
-                Constants.Outtake.Lift.jerk);
+                Constants.Outtake.Lift.jerk,
+                true);
     }
 
 
@@ -143,7 +169,8 @@ public class Lift {
                 Constants.Outtake.Lift.kd,
                 Constants.Outtake.Lift.cruiseVel,
                 Constants.Outtake.Lift.acc,
-                Constants.Outtake.Lift.jerk
+                Constants.Outtake.Lift.jerk,
+                false
         );
 
         setMotorConfig(
@@ -156,16 +183,20 @@ public class Lift {
                 Constants.Outtake.Lift.kd,
                 Constants.Outtake.Lift.cruiseVel,
                 Constants.Outtake.Lift.acc,
-                Constants.Outtake.Lift.jerk
+                Constants.Outtake.Lift.jerk,
+                true
         );
+
+        left.setPosition(0);
+        right.setPosition(0);
         
         request = new MotionMagicVoltage(0);
     }
     private void updatePID() {
         init(gamepad);
         request.withFeedForward(Constants.Outtake.Lift.kf);
-        left.setControl(request.withPosition(Constants.Outtake.Lift.TARGET_ROT));
-        right.setControl(request.withPosition(-Constants.Outtake.Lift.TARGET_ROT));
+        left.setControl(request.withPosition(Constants.Outtake.Lift.TARGET_ROT).withSlot(0));
+        right.setControl(request.withPosition(Constants.Outtake.Lift.TARGET_ROT).withSlot(0));
     }
 
     private void updateHardware(ArmState armState) {
@@ -181,8 +212,10 @@ public class Lift {
 
     public void update() {
 
+        updatePID();
+
         SmartDashboard.putNumber("left ", getMotorTicks(left));
-        SmartDashboard.putNumber("right ", -getMotorTicks(right));
+        SmartDashboard.putNumber("right ", getMotorTicks(right));
         ///SmartDashboard.putNumber("right - left ", -getMotorTicks(right) - getMotorTicks(left));
         SmartDashboard.putNumber("target rot", Constants.Outtake.Lift.TARGET_ROT);
         SmartDashboard.putNumber("kf", Constants.Outtake.Lift.kf);
@@ -196,10 +229,6 @@ public class Lift {
         SmartDashboard.putNumber("cruiseVel", Constants.Outtake.Lift.cruiseVel);
         SmartDashboard.putNumber("accell", Constants.Outtake.Lift.acc);
         SmartDashboard.putNumber("jerk", Constants.Outtake.Lift.jerk);
-        
-
-        updatePID();
-
     }
 
 }
