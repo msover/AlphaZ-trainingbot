@@ -312,7 +312,7 @@ public class Lift {
         SmartDashboard.putNumber("armState", left.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("scheduled", right.getPosition().getValueAsDouble());
         
-        // updateDash();
+        // updateDash();g
         // while(Constants.Outtake.SugativPID.trapLoop) {
         //     updateDash();        
         // }
