@@ -2,6 +2,7 @@ package frc.teleOp;
 
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.outtake.Outtake;
 
@@ -20,9 +21,8 @@ public class TeleOp {
         Outtake.getInstance().init(new PS5Controller(0));
     }
     public void loop() {
-        ///Intake.getInstance().update(0.6, 0.5, 0);
+        Intake.getInstance().update();
         Outtake.getInstance().update();
-        SmartDashboard.putNumber("pos", Intake.getInstance().getDriveIntakePos());
     }
 }
 ///Error at edu.wpi.first.wpilibj.RobotBase.runRobot(RobotBase.java:440): The startCompetition() method (or methods called by it) should have handled the exception above. ﻿

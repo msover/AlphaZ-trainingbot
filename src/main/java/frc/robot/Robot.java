@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    robotContainer.teleopPeriodic();
+    ///robotContainer.teleopPeriodic();
     TeleOp.getInstance().loop();
   }
 

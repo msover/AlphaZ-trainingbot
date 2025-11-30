@@ -78,7 +78,7 @@ public class Hardware {
         public class Lift {
             public static TalonFX leftMotor = new TalonFX(Constants.Outtake.Lift.leftMotorId, "canivore");
             public static TalonFX rightMotor = new TalonFX(Constants.Outtake.Lift.rightMotorId, "canivore");
-            
+            public static TalonFX sugativMotor = new TalonFX(Constants.Outtake.Lift.sugativMotorId, "canivore");
             
         }
     }

@@ -13,7 +13,7 @@ public class Outtake {
     }
 
     public void init(PS5Controller gamepad) {
-        Lift.getInstace().initPID();
+        Lift.getInstace().init(gamepad);
     }
     public void update() {
         Lift.getInstace().update();
