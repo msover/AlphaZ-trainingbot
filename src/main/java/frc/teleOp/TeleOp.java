@@ -16,13 +16,15 @@ public class TeleOp {
         }
         return instance;
     }
+    private PS5Controller controller = new PS5Controller(0);
     public void init() {
-        Intake.getInstance().init(new PS5Controller(0));
-        Outtake.getInstance().init(new PS5Controller(0));
+        Intake.getInstance().init(controller);
+        Outtake.getInstance().init(controller);
     }
     public void loop() {
-        Intake.getInstance().update();
-        Outtake.getInstance().update();
+        Intake.getInstance().update(controller);
+        Outtake.getInstance().update(controller);
+
     }
 }
 ///Error at edu.wpi.first.wpilibj.RobotBase.runRobot(RobotBase.java:440): The startCompetition() method (or methods called by it) should have handled the exception above. ﻿

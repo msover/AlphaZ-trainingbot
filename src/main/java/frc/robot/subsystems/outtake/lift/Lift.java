@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import edu.wpi.first.wpilibj.PS5Controller;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utils.constants.Constants;
 import frc.robot.utils.hardware.Hardware;
 
@@ -18,8 +19,14 @@ public class Lift {
         TRANSFER,
         SUGATIV_SUGE,
         SAFE,
+        SCORE,
+        SCORE1_DISPARITY,
+        SCORE2_DISPARITY,
+        SCORE3_DISPARITY,
+        SUGATIV_LASA,
         SCORE1,
         SCORE2,
+        SCORE3
     }
 
     private PS5Controller gamepad;
@@ -32,13 +39,15 @@ public class Lift {
         return instance;
     }
 
-    private ArmState armState = ArmState.SAFE;
-    private ArmState scheduledState = ArmState.SAFE;
+    private ArmState armState = ArmState.IDLE;
+    private ArmState scheduledState = ArmState.IDLE;
 
     private TalonFX left = Hardware.Outtake.Lift.leftMotor;
     private TalonFX right = Hardware.Outtake.Lift.rightMotor;
     private TalonFX sugativ = Hardware.Outtake.Lift.sugativMotor;
-    private MotionMagicVoltage request;
+    private MotionMagicVoltage liftRequest;
+    private MotionMagicVoltage sugativRequest;
+    private long startTime;
 
     public void setMotorConfig(TalonFX motor, double ks, double kv, double ka, double kp, double ki, double kd,
             int magicVel, int magicAcc, int magicJerk, boolean reversed) {
@@ -88,58 +97,63 @@ public class Lift {
     }
 
     public void init(PS5Controller gamepad) {
-        // SmartDashboard.putNumber("target rot left", Constants.Outtake.Lift.TARGET_ROT_LEFT);
-        // SmartDashboard.putNumber("target rot right", Constants.Outtake.Lift.TARGET_ROT_RIGHT);
-        // SmartDashboard.putNumber("kf", Constants.Outtake.Lift.kf);
-        // SmartDashboard.putNumber("ks", Constants.Outtake.Lift.ks);
-        // SmartDashboard.putNumber("kv", Constants.Outtake.Lift.kv);
-        // SmartDashboard.putNumber("ka", Constants.Outtake.Lift.ka);
-        // SmartDashboard.putNumber("kp", Constants.Outtake.Lift.kp);
-        // SmartDashboard.putNumber("ki", Constants.Outtake.Lift.ki);
-        // SmartDashboard.putNumber("kd", Constants.Outtake.Lift.kd);
-        // SmartDashboard.putNumber("cruiseVel", Constants.Outtake.Lift.cruiseVel);
-        // SmartDashboard.putNumber("accell", Constants.Outtake.Lift.acc);
-        // SmartDashboard.putNumber("jerk", Constants.Outtake.Lift.jerk);
-        // SmartDashboard.putBoolean("TRAP LOOP", Constants.Outtake.Lift.trapLoop);
         this.gamepad = gamepad;
         setMotorConfig(
                 left,
-                Constants.Outtake.PID.ks,
-                Constants.Outtake.PID.kv,
-                Constants.Outtake.PID.ka,
-                Constants.Outtake.PID.kp,
-                Constants.Outtake.PID.ki,
-                Constants.Outtake.PID.kd,
-                Constants.Outtake.PID.cruiseVel,
-                Constants.Outtake.PID.acc,
-                Constants.Outtake.PID.jerk,
+                Constants.Outtake.LiftPID.ks,
+                Constants.Outtake.LiftPID.kv,
+                Constants.Outtake.LiftPID.ka,
+                Constants.Outtake.LiftPID.kp,
+                Constants.Outtake.LiftPID.ki,
+                Constants.Outtake.LiftPID.kd,
+                Constants.Outtake.LiftPID.cruiseVel,
+                Constants.Outtake.LiftPID.acc,
+                Constants.Outtake.LiftPID.jerk,
                 false);
 
         setMotorConfig(
                 right,
-                Constants.Outtake.PID.ks,
-                Constants.Outtake.PID.kv,
-                Constants.Outtake.PID.ka,
-                Constants.Outtake.PID.kp,
-                Constants.Outtake.PID.ki,
-                Constants.Outtake.PID.kd,
-                Constants.Outtake.PID.cruiseVel,
-                Constants.Outtake.PID.acc,
-                Constants.Outtake.PID.jerk,
+                Constants.Outtake.LiftPID.ks,
+                Constants.Outtake.LiftPID.kv,
+                Constants.Outtake.LiftPID.ka,
+                Constants.Outtake.LiftPID.kp,
+                Constants.Outtake.LiftPID.ki,
+                Constants.Outtake.LiftPID.kd,
+                Constants.Outtake.LiftPID.cruiseVel,
+                Constants.Outtake.LiftPID.acc,
+                Constants.Outtake.LiftPID.jerk,
                 true);
+
+        setMotorConfig(
+            sugativ,
+            Constants.Outtake.SugativPID.ks,
+            Constants.Outtake.SugativPID.kv,
+            Constants.Outtake.SugativPID.ka,
+            Constants.Outtake.SugativPID.kp,
+            Constants.Outtake.SugativPID.ki,
+            Constants.Outtake.SugativPID.kd,
+            Constants.Outtake.SugativPID.cruiseVel,
+            Constants.Outtake.SugativPID.acc,
+            Constants.Outtake.SugativPID.jerk,
+            true
+        );
         
         
 
-                left.setPosition(0);
-                right.setPosition(0);
-                
-                request = new MotionMagicVoltage(0);
-                request.withFeedForward(Constants.Outtake.PID.kf);
-                left.setControl(request.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
-                right.setControl(request.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
+        left.setPosition(0);
+        right.setPosition(0);
+
+        sugativ.setPosition(0);
+        
+        liftRequest = new MotionMagicVoltage(0);
+        liftRequest.withFeedForward(Constants.Outtake.LiftPID.kf);
+        sugativRequest = new MotionMagicVoltage(0);
+
+        startTime = System.currentTimeMillis();
+        initDash();
     }
 
-    public void update() {
+    private void fsm() {
         switch(armState) {
             case IDLE:
                 if(gamepad.getCrossButtonPressed()) {
@@ -150,69 +164,159 @@ public class Lift {
                     armState = ArmState.TRANSFER;
                     scheduledState = ArmState.SCORE2;
                 }
-                left.setControl(request.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
-                right.setControl(request.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
+                if(gamepad.getTriangleButtonPressed()) {
+                    armState = ArmState.TRANSFER;
+                    scheduledState = ArmState.SCORE3;
+                }
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
+
                 break;
             
-
             case TRANSFER:
-                if(Math.abs(left.getPosition().getValueAsDouble() - Constants.Outtake.Lift.TRANSFER) < Constants.Outtake.PID.PERMISSIVE_ERROR) {
+                if(Math.abs(left.getPosition().getValueAsDouble() - Constants.Outtake.Lift.TRANSFER) < Constants.Outtake.LiftPID.PERMISSIVE_COLLECTION_ERROR) {
                     armState = ArmState.SUGATIV_SUGE;
                 }
-                left.setControl(request.withPosition(Constants.Outtake.Lift.TRANSFER).withSlot(0));
-                right.setControl(request.withPosition(Constants.Outtake.Lift.TRANSFER).withSlot(0));
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.TRANSFER).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.TRANSFER).withSlot(0));
                 break;
 
             case SUGATIV_SUGE:
-                if(Math.abs(sugativ.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SUGATIV_SUGE) < Constants.Outtake.PID.PERMISSIVE_ERROR) {
+                if(Math.abs(sugativ.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SUGATIV_SUGE) < Constants.Outtake.LiftPID.PERMISSIVE_ERROR) {
                     armState = ArmState.SAFE;
                 }
-                sugativ.setControl(request.withPosition(Constants.Outtake.Lift.SUGATIV_SUGE).withSlot(0));
+                sugativ.setControl(sugativRequest.withPosition(Constants.Outtake.Lift.SUGATIV_SUGE).withSlot(0));
                 break;
 
             case SAFE:
-                if(Math.abs(sugativ.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SAFE) < Constants.Outtake.PID.PERMISSIVE_ERROR) {
+                if(Math.abs(left.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SAFE) < Constants.Outtake.LiftPID.PERMISSIVE_ERROR) {
                     armState = scheduledState;
                 }
-                left.setControl(request.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
-                right.setControl(request.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SAFE).withSlot(0));
                 break;
+
+            
+            case SCORE1_DISPARITY:
+                if(gamepad.getCrossButtonPressed()) {
+                    armState = ArmState.IDLE;
+                    scheduledState = ArmState.IDLE;
+                }    
+                if(gamepad.getTouchpadButtonPressed()) {
+                    scheduledState = armState;
+                    armState = ArmState.SUGATIV_LASA;
+                }
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE1 - Constants.Outtake.Lift.SCORE1_DISPARITY).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE1 + Constants.Outtake.Lift.SCORE1_DISPARITY).withSlot(0));
+                break;
+            case SCORE2_DISPARITY:
+                if(gamepad.getSquareButtonPressed()) {
+                    armState = ArmState.IDLE;
+                    scheduledState = ArmState.IDLE;
+                }    
+                if(gamepad.getTouchpadButtonPressed()) {
+                    scheduledState = armState;
+                    armState = ArmState.SUGATIV_LASA;
+                    
+                }
+                
+            
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE2 - Constants.Outtake.Lift.SCORE2_DISPARITY).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE2 + Constants.Outtake.Lift.SCORE2_DISPARITY).withSlot(0));
+            
+                break;
+            case SCORE3_DISPARITY:
+                if(gamepad.getTriangleButtonPressed()) {
+                    armState = ArmState.IDLE;
+                    scheduledState = ArmState.IDLE;
+                }    
+                if(gamepad.getTouchpadButtonPressed()) {
+                    scheduledState = armState;
+                    armState = ArmState.SUGATIV_LASA;
+                }
+                    left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE3 - Constants.Outtake.Lift.SCORE3_DISPARITY).withSlot(0));
+                    right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE3 + Constants.Outtake.Lift.SCORE3_DISPARITY).withSlot(0));
+                break;
+
+            case SUGATIV_LASA:
+                if(Math.abs(sugativ.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SUGATIV_LASA) < Constants.Outtake.LiftPID.PERMISSIVE_ERROR) {
+                    armState = scheduledState;
+                }
+                sugativ.setControl(sugativRequest.withPosition(Constants.Outtake.Lift.SUGATIV_LASA).withSlot(0));
+                break;
+
 
             case SCORE1:
-                left.setControl(request.withPosition(Constants.Outtake.Lift.LEFT_SCORE1).withSlot(0));
-                right.setControl(request.withPosition(Constants.Outtake.Lift.RIGHT_SCORE1).withSlot(0));
-                if(gamepad.getCrossButtonPressed()) {
-                    scheduledState = ArmState.IDLE;
+                if(Math.abs(left.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SCORE1) < Constants.Outtake.LiftPID.PERMISSIVE_ERROR) {
+                    armState = ArmState.SCORE1_DISPARITY;
+                    scheduledState = ArmState.SCORE1_DISPARITY;
                 }
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE1).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE1).withSlot(0));
                 break;
-            
+                
             case SCORE2:
-                left.setControl(request.withPosition(Constants.Outtake.Lift.LEFT_SCORE2).withSlot(0));
-                right.setControl(request.withPosition(Constants.Outtake.Lift.RIGHT_SCORE2).withSlot(0));
-                if(gamepad.getSquareButtonPressed()) {
-                    scheduledState = ArmState.IDLE;
+                if(Math.abs(left.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SCORE2) < Constants.Outtake.LiftPID.PERMISSIVE_ERROR) {
+                    armState = ArmState.SCORE2_DISPARITY;
+                    scheduledState = ArmState.SCORE2_DISPARITY;
                 }
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE2).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE2).withSlot(0));
+                break;
+
+            case SCORE3:
+                if(Math.abs(left.getPosition().getValueAsDouble() - Constants.Outtake.Lift.SCORE3) < Constants.Outtake.LiftPID.PERMISSIVE_ERROR) {
+                    armState = ArmState.SCORE3_DISPARITY;
+                    scheduledState = ArmState.SCORE3_DISPARITY;
+                }
+                left.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE3).withSlot(0));
+                right.setControl(liftRequest.withPosition(Constants.Outtake.Lift.SCORE3).withSlot(0));
                 break;
         }
-        
+    }
+    private void initDash() {
+        SmartDashboard.putNumber("target rot", Constants.Outtake.SugativPID.TARGET_ROT);
+        SmartDashboard.putNumber("kf", Constants.Outtake.SugativPID.kf);
+        SmartDashboard.putNumber("ks", Constants.Outtake.SugativPID.ks);
+        SmartDashboard.putNumber("kv", Constants.Outtake.SugativPID.kv);
+        SmartDashboard.putNumber("ka", Constants.Outtake.SugativPID.ka);
+        SmartDashboard.putNumber("kp", Constants.Outtake.SugativPID.kp);
+        SmartDashboard.putNumber("ki", Constants.Outtake.SugativPID.ki);
+        SmartDashboard.putNumber("kd", Constants.Outtake.SugativPID.kd);
+        SmartDashboard.putNumber("cruiseVel", Constants.Outtake.SugativPID.cruiseVel);
+        SmartDashboard.putNumber("accell", Constants.Outtake.SugativPID.acc);
+        SmartDashboard.putNumber("jerk", Constants.Outtake.SugativPID.jerk);
+        SmartDashboard.putBoolean("TRAP LOOP", Constants.Outtake.SugativPID.trapLoop);
+    }
+    private void updateDash() {
+        SmartDashboard.putNumber("pos", sugativ.getPosition().getValueAsDouble());
+        Constants.Outtake.SugativPID.TARGET_ROT = SmartDashboard.getNumber("target rot", Constants.Outtake.SugativPID.TARGET_ROT);
+        Constants.Outtake.SugativPID.kf = SmartDashboard.getNumber("kf", Constants.Outtake.SugativPID.kf);
+        Constants.Outtake.SugativPID.ks = SmartDashboard.getNumber("ks", Constants.Outtake.SugativPID.ks);
+        Constants.Outtake.SugativPID.kv = SmartDashboard.getNumber("kv", Constants.Outtake.SugativPID.kv);
+        Constants.Outtake.SugativPID.ka = SmartDashboard.getNumber("ka", Constants.Outtake.SugativPID.ka);
+        Constants.Outtake.SugativPID.kp = SmartDashboard.getNumber("kp", Constants.Outtake.SugativPID.kp);
+        Constants.Outtake.SugativPID.ki = SmartDashboard.getNumber("ki", Constants.Outtake.SugativPID.ki);
+        Constants.Outtake.SugativPID.kd = SmartDashboard.getNumber("kd", Constants.Outtake.SugativPID.kd);
+        Constants.Outtake.SugativPID.cruiseVel = (int) SmartDashboard.getNumber("cruiseVel", Constants.Outtake.SugativPID.cruiseVel);
+        Constants.Outtake.SugativPID.acc = (int) SmartDashboard.getNumber("accell", Constants.Outtake.SugativPID.acc);
+        Constants.Outtake.SugativPID.jerk = (int) SmartDashboard.getNumber("jerk", Constants.Outtake.SugativPID.jerk);
+        Constants.Outtake.SugativPID.trapLoop = SmartDashboard.getBoolean("TRAP LOOP",Constants.Outtake.SugativPID.trapLoop);
+    }
 
-        ///SmartDashboard.putNumber("left ", getMotorTicks(left));
-        ///SmartDashboard.putNumber("right ", getMotorTicks(right));
-        ///SmartDashboard.putNumber("right - left ", -getMotorTicks(right) - getMotorTicks(left));
+    public void update(PS5Controller gamepad) {
+        this.gamepad = gamepad;
+        if(System.currentTimeMillis() - startTime > Constants.Outtake.Lift.TIMEOUT_MS) {
+            fsm();
+        }
+        SmartDashboard.putNumber("armState", left.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("scheduled", right.getPosition().getValueAsDouble());
         
-        // Constants.Outtake.Lift.TARGET_ROT_LEFT = SmartDashboard.getNumber("target rot left", Constants.Outtake.Lift.TARGET_ROT_LEFT);
-        // Constants.Outtake.Lift.TARGET_ROT_RIGHT = SmartDashboard.getNumber("target rot right", Constants.Outtake.Lift.TARGET_ROT_RIGHT);
-        // Constants.Outtake.Lift.kf = SmartDashboard.getNumber("kf", Constants.Outtake.Lift.kf);
-        // Constants.Outtake.Lift.ks = SmartDashboard.getNumber("ks", Constants.Outtake.Lift.ks);
-        // Constants.Outtake.Lift.kv = SmartDashboard.getNumber("kv", Constants.Outtake.Lift.kv);
-        // Constants.Outtake.Lift.ka = SmartDashboard.getNumber("ka", Constants.Outtake.Lift.ka);
-        // Constants.Outtake.Lift.kp = SmartDashboard.getNumber("kp", Constants.Outtake.Lift.kp);
-        // Constants.Outtake.Lift.ki = SmartDashboard.getNumber("ki", Constants.Outtake.Lift.ki);
-        // Constants.Outtake.Lift.kd = SmartDashboard.getNumber("kd", Constants.Outtake.Lift.kd);
-        // Constants.Outtake.Lift.cruiseVel = (int)SmartDashboard.getNumber("cruiseVel", Constants.Outtake.Lift.cruiseVel);
-        // Constants.Outtake.Lift.acc = (int)SmartDashboard.getNumber("accell", Constants.Outtake.Lift.acc);
-        // Constants.Outtake.Lift.jerk = (int)SmartDashboard.getNumber("jerk", Constants.Outtake.Lift.jerk);
-        // Constants.Outtake.Lift.trapLoop = SmartDashboard.getBoolean("TRAP LOOP",Constants.Outtake.Lift.trapLoop);
+        // updateDash();
+        // while(Constants.Outtake.SugativPID.trapLoop) {
+        //     updateDash();        
+        // }
+        // sugativ.setControl(sugativRequest.withPosition(Constants.Outtake.SugativPID.TARGET_ROT).withSlot(0));
     }
 
 }

@@ -67,7 +67,7 @@ public class Hardware {
     public class Intake{
         public class Pivot {
             public static TalonFX drive = new TalonFX(Constants.Intake.Pivot.driveId, "canivore");
-            public static TalonFX lift = new TalonFX(Constants.Intake.Pivot.liftId, "canivore");
+            public static TalonFX pivot = new TalonFX(Constants.Intake.Pivot.pivotId, "canivore");
         }
         public class Storage {
             public static TalonFX left = new TalonFX(Constants.Intake.Storage.leftId, "canivore");
