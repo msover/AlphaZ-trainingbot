@@ -74,7 +74,7 @@ public class Outtake implements Subsystem {
             case PASSTHROUGH:
                 break;
             case TRANSFER:
-                if (lift.inPosition(Lift.errorThreshold)) {
+                if (lift.inPosition(Lift.errorThreshold) || timer.get() > Lift.timeThresholdTransfer) {
                     setState(State.TRANSFERRING);
                 }
                 break;
@@ -88,7 +88,7 @@ public class Outtake implements Subsystem {
                 // if (timer.get() > Suction.suckTimeout) {
                 //     setState(State.PASSTHROUGH);
                 // }
-                if (suction.inPosition(Suction.errorThreshold)) {
+                if (suction.inPosition(Suction.errorThreshold) || timer.get() > Suction.timeThreshold) {
                     setState(State.PASSTHROUGH);
                 }
                 break;

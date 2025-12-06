@@ -18,7 +18,7 @@ public class Suction implements Subsystem {
     public static double RELEASE = 0;
     public static double SUCK = 4.8;
 
-    public static double suckTimeout = 0.2;
+    public static double timeThreshold = 1;
     public static double errorThreshold = 0.1;
 
     public static double ks = 0;

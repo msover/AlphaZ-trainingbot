@@ -36,6 +36,7 @@ public class Lift implements Subsystem {
     public static double jerk = 1000;
 
     public static double errorThreshold = 0.1;
+    public static double timeThresholdTransfer = 1;
 
     public static double targetLeft = 0;
     public static double targetRight = 0;
