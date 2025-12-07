@@ -15,53 +15,66 @@ public class Lift implements Subsystem {
         SCORE_LOW
     }
 
-    public LiftState liftState = LiftState.IN;
+    public LiftState liftState = LiftState.PASSTHROUGH;
 
     public static double IN = 0;
     public static double PASSTHROUGH = 3;
-    public static double TRANSFER = 0.5;
-    public static double SCORE_LOW_LEFT = 8.5;
+    public static double TRANSFER = 0.83;
+    public static double SCORE_LOW_LEFT = 5.5;
     public static double SCORE_LOW_RIGHT = 5.5;
 
     public static double ks = 0;
-    public static double kv = 0.12;
-    public static double ka = 0.01;
-    public static double kp = 13.5;
+    public static double kv = 0; //0.12
+    public static double ka = 0; //0.01
+    public static double kp = 5.5; //13.5
     public static double ki = 0;
-    public static double kd = 0;
-    public static double kf = 0.25;
+    public static double kd = 0.2;
+    public static double kf = 0.35; //0.35
+    public static double kf_angle = 0.75;
 
-    public static double vel = 35;
-    public static double acc = 150;
-    public static double jerk = 1000;
+    public static double angle = 0;
 
-    public static double errorThreshold = 0.1;
+    public static double vel = 10; //35
+    public static double acc = 2; //150
+    public static double jerk = 5; //1000
+
+    public static double errorThreshold = 0.2;
     public static double timeThresholdTransfer = 1;
 
-    public static double targetLeft = 0;
-    public static double targetRight = 0;
+    public static double targetLeft = PASSTHROUGH;
+    public static double targetRight = PASSTHROUGH;
+
+    public static boolean tuning = false;
+
 
     @Override
     public void initialize() {
         robot.leftLiftMotor.setEncoderPosition(0);
         robot.rightLiftMotor.setEncoderPosition(0);
+
         initTelemetry();
     }
 
     @Override
     public void loop() {
-        robot.leftLiftMotor.setFeedForward(kf);
-        robot.rightLiftMotor.setFeedForward(kf);
+
+        robot.leftLiftMotor.setFeedForward(kf + kf_angle*Math.sin(Math.toRadians(getAngle())));
+        robot.rightLiftMotor.setFeedForward(kf - kf_angle*Math.sin(Math.toRadians(getAngle())));
 
         //TODO comment this after done tuning
-        robot.leftLiftMotor.setMotionMagicCoefficients(ks, kv, ka, kp, ki, kd, vel, acc, jerk);
-        robot.rightLiftMotor.setMotionMagicCoefficients(ks, kv, ka, kp, ki, kd, vel, acc, jerk);
+        if (tuning) {
+            robot.leftLiftMotor.setMotionMagicCoefficients(ks, kv, ka, kp, ki, kd, vel, acc, jerk);
+            robot.rightLiftMotor.setMotionMagicCoefficients(ks, kv, ka, kp, ki, kd, vel, acc, jerk);
 
-        robot.leftLiftMotor.updateMotionMagicCoefficients();
-        robot.rightLiftMotor.updateMotionMagicCoefficients();
+            robot.leftLiftMotor.updateMotionMagicCoefficients();
+            robot.rightLiftMotor.updateMotionMagicCoefficients();
 
-        robot.leftLiftMotor.applyMotorConfig();
-        robot.rightLiftMotor.applyMotorConfig();
+            robot.leftLiftMotor.applyMotorConfig();
+            robot.rightLiftMotor.applyMotorConfig();
+        }
+
+        setLeftPosition(targetLeft);
+        setRightPosition(targetRight);
 
         updateState();
         updateTelemetry();
@@ -71,17 +84,20 @@ public class Lift implements Subsystem {
         this.liftState = liftState;
         switch (liftState) {
             case IN:
-                setPosition(IN);
+                targetLeft = IN;
+                targetRight = IN;
                 break;
             case PASSTHROUGH:
-                setPosition(PASSTHROUGH);
+                targetLeft = PASSTHROUGH;
+                targetRight = PASSTHROUGH;
                 break;
             case TRANSFER:
-                setPosition(TRANSFER);
+                targetLeft = TRANSFER;
+                targetRight = TRANSFER;
                 break;
             case SCORE_LOW:
-                setLeftPosition(SCORE_LOW_LEFT);
-                setRightPosition(SCORE_LOW_RIGHT);
+                targetLeft = SCORE_LOW_LEFT;
+                targetRight = SCORE_LOW_RIGHT;
                 break;
         }
     }
@@ -100,12 +116,10 @@ public class Lift implements Subsystem {
     }
 
     public void setLeftPosition(double position) {
-        targetLeft = position;
         robot.leftLiftMotor.setMotionMagicPosition(position);
     }
 
     public void setRightPosition(double position) {
-        targetRight = position;
         robot.rightLiftMotor.setMotionMagicPosition(position);
     }
 
@@ -125,15 +139,21 @@ public class Lift implements Subsystem {
     }
 
     public double getLeftPositionError() {
-        return robot.leftLiftMotor.getPositionError();
+        //return robot.leftLiftMotor.getPositionError();
+        return Math.abs(robot.leftLiftMotor.getPosition()-targetLeft);
     }
 
     public double getRightPositionError() {
-        return robot.rightLiftMotor.getPositionError();
+        //return robot.rightLiftMotor.getPositionError();
+        return Math.abs(robot.rightLiftMotor.getPosition()-targetRight);
     }
 
     public boolean inPosition(double error) {
         return getLeftPositionError() < error && getRightPositionError() < error;
+    }
+
+    public double getAngle() {
+        return 90/2.321*(getLeftPosition() - getRightPosition());
     }
 
     public void initTelemetry() {
@@ -144,9 +164,12 @@ public class Lift implements Subsystem {
         SmartDashboard.putNumber("lift ki", ki);
         SmartDashboard.putNumber("lift kd", kd);
         SmartDashboard.putNumber("lift kf", kf);
+        SmartDashboard.putNumber("lift kf_angle", kf_angle);
         SmartDashboard.putNumber("lift vel", vel);
         SmartDashboard.putNumber("lift acc", acc);
         SmartDashboard.putNumber("lift jerk", jerk);
+        SmartDashboard.putNumber("lift target left", targetLeft);
+        SmartDashboard.putNumber("lift target right", targetRight);
     }
 
     public void updateTelemetry() {
@@ -171,8 +194,11 @@ public class Lift implements Subsystem {
         ki = SmartDashboard.getNumber("lift ki", ki);
         kd = SmartDashboard.getNumber("lift kd", kd);
         kf = SmartDashboard.getNumber("lift kf", kf);
+        kf_angle = SmartDashboard.getNumber("lift kf_angle", kf_angle);
         vel = SmartDashboard.getNumber("lift vel", vel);
         acc = SmartDashboard.getNumber("lift acc", acc);
         jerk = SmartDashboard.getNumber("lift jerk", jerk);
+        // targetLeft = SmartDashboard.getNumber("lift target left", targetLeft);
+        // targetRight = SmartDashboard.getNumber("lift target right", targetRight);
     }
 }

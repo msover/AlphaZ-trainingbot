@@ -9,18 +9,18 @@ import frc.robot.subsystems.outtake.Lift;
 import frc.robot.subsystems.outtake.Suction;
 
 public class RobotHardware {
-    public AlphaTalonFX activeIntakeMotor = new AlphaTalonFX(51, "canivore", true);
-    public AlphaTalonFX leftStorageMotor = new AlphaTalonFX(61, "canivore", true);
-    public AlphaTalonFX rightStorageMotor = new AlphaTalonFX(62, "canivore", false);
-    public AlphaTalonFX pivotMotor = new AlphaTalonFX(52, "canivore", true, Pivot.ks, Pivot.kv, Pivot.ka, Pivot.kp, Pivot.ki, Pivot.kd, Pivot.vel, Pivot.acc, Pivot.jerk);
+    public AlphaTalonFX activeIntakeMotor;
+    public AlphaTalonFX leftStorageMotor;
+    public AlphaTalonFX rightStorageMotor;
+    public AlphaTalonFX pivotMotor;
 
-    public AlphaTalonFX leftLiftMotor = new AlphaTalonFX(17, "canivore", false, Lift.ks, Lift.kv, Lift.ka, Lift.kp, Lift.ki, Lift.kd, Lift.vel, Lift.acc, Lift.jerk);
-    public AlphaTalonFX rightLiftMotor = new AlphaTalonFX(27, "canivore", true, Lift.ks, Lift.kv, Lift.ka, Lift.kp, Lift.ki, Lift.kd, Lift.vel, Lift.acc, Lift.jerk);
-    public AlphaTalonFX suctionMotor = new AlphaTalonFX(37, "canivore", true, Suction.ks, Suction.kv, Suction.ka, Suction.kp, Suction.ki, Suction.kd, Suction.vel, Suction.acc, Suction.jerk);
+    public AlphaTalonFX leftLiftMotor;
+    public AlphaTalonFX rightLiftMotor;
+    public AlphaTalonFX suctionMotor;
 
-    public SwerveDrive drive = new SwerveDrive();
-    public Intake intake = new Intake();
-    public Outtake outtake = new Outtake();
+    public SwerveDrive drive;
+    public Intake intake;
+    public Outtake outtake;
 
     private static RobotHardware instance = null;
     //private boolean enabled;
@@ -34,14 +34,18 @@ public class RobotHardware {
     }
 
     public void initializeHardware() {
-        // activeIntakeMotor = new TalonFX(51, "canivore");
-        // pivotMotor = new TalonFX(52, "canivore");
-        // leftStorageMotor = new TalonFX(61, "canivore");
-        // rightStorageMotor = new TalonFX(62, "canivore");
+        activeIntakeMotor = new AlphaTalonFX(51, "canivore", true);
+        leftStorageMotor = new AlphaTalonFX(61, "canivore", true);
+        rightStorageMotor = new AlphaTalonFX(62, "canivore", false);
+        pivotMotor = new AlphaTalonFX(52, "canivore", true, Pivot.ks, Pivot.kv, Pivot.ka, Pivot.kp, Pivot.ki, Pivot.kd, Pivot.vel, Pivot.acc, Pivot.jerk);
 
-        // leftLiftMotor = new TalonFX(17, "canivore");
-        // rightLiftMotor = new TalonFX(27, "canivore");
-        // suctionMotor = new TalonFX(37, "canivore");
+        leftLiftMotor = new AlphaTalonFX(27, "canivore", true, Lift.ks, Lift.kv, Lift.ka, Lift.kp, Lift.ki, Lift.kd, Lift.vel, Lift.acc, Lift.jerk);
+        rightLiftMotor = new AlphaTalonFX(17, "canivore", false, Lift.ks, Lift.kv, Lift.ka, Lift.kp, Lift.ki, Lift.kd, Lift.vel, Lift.acc, Lift.jerk);
+        suctionMotor = new AlphaTalonFX(37, "canivore", true, Suction.ks, Suction.kv, Suction.ka, Suction.kp, Suction.ki, Suction.kd, Suction.vel, Suction.acc, Suction.jerk);
+
+        drive = new SwerveDrive();
+        intake = new Intake();
+        outtake = new Outtake();
     }
 
     public void initializeActuators() {
@@ -52,7 +56,7 @@ public class RobotHardware {
 
     public void loop() {
         drive.loop();
-        intake.loop();
+        //intake.loop();
         outtake.loop();
     }
 }

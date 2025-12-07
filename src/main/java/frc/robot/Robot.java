@@ -10,33 +10,40 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.hardware.RobotHardware;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
+import frc.robot.subsystems.outtake.Lift;
 import frc.robot.subsystems.outtake.Suction;
+import frc.robot.subsystems.outtake.Lift.LiftState;
 import frc.robot.util.Vector;
 
 public class Robot extends TimedRobot {
 
-  private final RobotHardware robot = RobotHardware.getInstance();
+  private final RobotHardware robot;
 
-  private final PS5Controller gamepad = new PS5Controller(0);
+  private final PS5Controller gamepad;
 
-  Timer timer = new Timer();
+  Timer timer;
 
   double timeThreshold = 1;
 
-  double testValue = 0;
+  double testValue = 1;
+
+  public Robot() {
+    robot = RobotHardware.getInstance();
+    gamepad = new PS5Controller(0);
+    timer = new Timer();
+  }
 
   @Override
   public void robotInit() {
     robot.initializeHardware();
     robot.initializeActuators();
     timer.reset();
+    timer.start();
   }
 
   @Override
   public void robotPeriodic() {
-    if (timer.get() > timeThreshold) {
-      robot.loop();
-    }
+    //DO NOT PUT ANYTHING HERE!!!!!!!!!!!!!
   }
 
   @Override
@@ -58,32 +65,31 @@ public class Robot extends TimedRobot {
   public void autonomousExit() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    timer.reset();
+    timer.start();
+  }
 
   @Override
   public void teleopPeriodic() {
 
     if (timer.get() > timeThreshold) {
 
-      if (gamepad.getPSButtonPressed()) {
-        testValue += 1;
-      }
-
-      System.out.println(testValue);
+      robot.loop();
 
       robot.drive.setTargetVector(new Vector(-gamepad.getLeftY(), -gamepad.getLeftX(), -gamepad.getRightX()));
 
+      if (gamepad.getTriangleButtonPressed()) {
+        Lift.tuning = !Lift.tuning;
+      }
+
       if (gamepad.getR1ButtonPressed()) {
-        switch (robot.intake.getState()) {
-          case UP:
-              robot.intake.setState(Intake.State.INTAKE);
-              break;
-          case INTAKE:
-              robot.intake.setState(Intake.State.REVERSE);
-              break;
-          case REVERSE:
-              robot.intake.setState(Intake.State.INTAKE);
-              break;
+        if (robot.intake.getState() == Intake.State.UP) {
+          robot.intake.setState(Intake.State.INTAKE);
+        } else if (robot.intake.getState() == Intake.State.INTAKE) {
+          robot.intake.setState(Intake.State.REVERSE);
+        } else if (robot.intake.getState() == Intake.State.REVERSE) {
+          robot.intake.setState(Intake.State.INTAKE);
         }
       }
 
@@ -95,7 +101,7 @@ public class Robot extends TimedRobot {
         robot.outtake.setState(Outtake.State.TRANSFER);
       }
 
-      if (gamepad.getCrossButtonPressed()) {
+      if (false) {
         if (robot.outtake.getState() == Outtake.State.PASSTHROUGH) {
           robot.outtake.setState(Outtake.State.SCORE_LOW);
         } else if (robot.outtake.getState() == Outtake.State.SCORE_LOW && robot.outtake.suction.getState() == Suction.SuctionState.SUCK) {
@@ -104,12 +110,35 @@ public class Robot extends TimedRobot {
           robot.outtake.setState(Outtake.State.PASSTHROUGH);
         }
       }
+
+      if (gamepad.getSquareButtonPressed()) {
+        //robot.outtake.lift.setState(LiftState.SCORE_LOW);
+        robot.outtake.lift.targetLeft = 7;
+        robot.outtake.lift.targetRight = 7;
+      }
+
+      if (gamepad.getCircleButtonPressed()) {
+        robot.outtake.lift.targetLeft = 8.5;
+        robot.outtake.lift.targetRight = 5.5;
+      }
+
+      if (gamepad.getCrossButtonPressed()) {
+        robot.outtake.lift.targetLeft = 9;
+        robot.outtake.lift.targetRight = 5;
+      }
+
+      if (gamepad.getPSButtonPressed()) {
+        robot.outtake.lift.targetLeft = 3;
+        robot.outtake.lift.targetRight = 3;
+      }
     }
 
   }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    Lift.tuning = false;
+  }
 
   @Override
   public void testInit() {}

@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.outtake.Lift;
 import frc.robot.subsystems.outtake.Suction;
 import frc.robot.subsystems.outtake.Lift.LiftState;
@@ -23,6 +24,8 @@ public class Outtake implements Subsystem {
 
     Timer timer = new Timer();
 
+    boolean start = false;
+
     public Outtake() {
         lift = new Lift();
         suction = new Suction();
@@ -32,6 +35,8 @@ public class Outtake implements Subsystem {
     public void initialize() {
         lift.initialize();
         suction.initialize();
+        timer.reset();
+        timer.start();
     }
 
     @Override
@@ -39,11 +44,19 @@ public class Outtake implements Subsystem {
         lift.loop();
         suction.loop();
         updateState();
+
+        // if (!start) {
+        //     setState(state);
+        //     start = true;
+        // }
+
+        SmartDashboard.putString("outtake state", state.toString());
     }
     
     public void setState(State state) {
         this.state = state;
         timer.reset();
+        timer.start();
         switch (state) {
             case IN:
                 lift.setState(LiftState.IN);
@@ -74,9 +87,13 @@ public class Outtake implements Subsystem {
             case PASSTHROUGH:
                 break;
             case TRANSFER:
-                if (lift.inPosition(Lift.errorThreshold) || timer.get() > Lift.timeThresholdTransfer) {
+                if (lift.inPosition(Lift.errorThreshold)) {
                     setState(State.TRANSFERRING);
                 }
+
+                // if (timer.get() > 2) {
+                //     setState(State.TRANSFERRING);
+                // }
                 break;
             case TRANSFERRING:
                 // boolean inPosition = suction.inPosition(Suction.errorThreshold);
@@ -88,7 +105,7 @@ public class Outtake implements Subsystem {
                 // if (timer.get() > Suction.suckTimeout) {
                 //     setState(State.PASSTHROUGH);
                 // }
-                if (suction.inPosition(Suction.errorThreshold) || timer.get() > Suction.timeThreshold) {
+                if (suction.inPosition(Suction.errorThreshold)) {
                     setState(State.PASSTHROUGH);
                 }
                 break;

@@ -38,7 +38,7 @@ public class Suction implements Subsystem {
     @Override
     public void initialize() {
         robot.suctionMotor.setEncoderPosition(0);
-        initTelemetry();
+        //initTelemetry();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Suction implements Subsystem {
         // robot.suctionMotor.applyMotorConfig();
 
         updateState();
-        updateTelemetry();
+        //updateTelemetry();
     }
     
     public void setState(SuctionState suctionState) {
@@ -83,7 +83,8 @@ public class Suction implements Subsystem {
     }
 
     public double getPositionError() {
-        return robot.suctionMotor.getPositionError();
+        //return robot.suctionMotor.getPositionError();
+        return Math.abs(robot.suctionMotor.getPosition()-target);
     }
 
     public boolean inPosition(double error) {

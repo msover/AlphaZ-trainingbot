@@ -15,7 +15,7 @@ public class Pivot implements Subsystem {
 
     public PivotState pivotState = PivotState.UP;
 
-    public static double UP = 11;
+    public static double UP = 7;
     public static double DOWN = -0.5;
 
     public static double ks = 0;
@@ -31,6 +31,8 @@ public class Pivot implements Subsystem {
     public static double jerk = 1000;
 
     public static double target = 0;
+
+    boolean start = false;
 
     @Override
     public void initialize() {
@@ -48,6 +50,13 @@ public class Pivot implements Subsystem {
         // robot.pivotMotor.updateMotionMagicCoefficients();
 
         // robot.pivotMotor.applyMotorConfig();
+
+        //robot.pivotMotor.setMotionMagicPosition(target);
+
+        // if (!start) {
+        //     setState(pivotState);
+        //     start = true;
+        // }
 
         updateState();
         updateTelemetry();

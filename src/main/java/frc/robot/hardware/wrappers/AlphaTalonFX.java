@@ -81,7 +81,7 @@ public class AlphaTalonFX {
     }
 
     public void setEncoderPosition(double position) {
-        motor.setPosition(0);
+        motor.setPosition(position);
     }
 
     public double getPosition() {
@@ -101,11 +101,11 @@ public class AlphaTalonFX {
     }
 
     public void setMotionMagicPosition(double position) {
-        motor.setControl(motionMagicVoltage.withPosition(position));
+        motor.setControl(motionMagicVoltage.withPosition(position).withSlot(0));
     }
 
     public void setFeedForward(double ff) {
-        motionMagicVoltage.withFeedForward(ff);
+        motionMagicVoltage.withFeedForward(ff).withSlot(0);
     }
 
     public void setMotionMagicCoefficients(double ks, double kv, double ka, double kp, double ki, double kd, double vel, double acc, double jerk) {

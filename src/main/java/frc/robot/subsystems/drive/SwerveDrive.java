@@ -17,7 +17,7 @@ import frc.robot.subsystems.drive.SwerveConstants.TunerSwerveDrivetrain;
 
 public class SwerveDrive implements Subsystem {
     private double MaxSpeed = SwerveConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = RotationsPerSecond.of(0.3).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity 0.75
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -44,9 +44,9 @@ public class SwerveDrive implements Subsystem {
       powerVector = new Vector(targetVector.getX(), targetVector.getY(), targetVector.getZ());
 
       drivetrain.setControl(
-         drive.withVelocityX(powerVector.getX() * MaxSpeed)
-            .withVelocityY(powerVector.getY() * MaxSpeed)
-            .withRotationalRate(powerVector.getZ() * MaxAngularRate)
+         drive.withVelocityX(powerVector.getX() * MaxSpeed*0.5)
+            .withVelocityY(powerVector.getY() * MaxSpeed*0.5)
+            .withRotationalRate(powerVector.getZ() * MaxAngularRate*1)
       );
       drivetrain.registerTelemetry(logger::telemeterize);
    }
