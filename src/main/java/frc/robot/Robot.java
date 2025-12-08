@@ -12,7 +12,6 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Outtake;
 import frc.robot.subsystems.outtake.Lift;
 import frc.robot.subsystems.outtake.Suction;
-import frc.robot.subsystems.outtake.Lift.LiftState;
 import frc.robot.util.Vector;
 
 public class Robot extends TimedRobot {

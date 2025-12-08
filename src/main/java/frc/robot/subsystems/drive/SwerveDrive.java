@@ -9,6 +9,12 @@ import static edu.wpi.first.units.Units.*;
 import frc.robot.util.Vector;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import frc.robot.Telemetry;
@@ -49,6 +55,12 @@ public class SwerveDrive implements Subsystem {
             .withRotationalRate(powerVector.getZ() * MaxAngularRate*1)
       );
       drivetrain.registerTelemetry(logger::telemeterize);
+      // drivetrain.getModule(0).getDriveMotor().setControl(new CoastOut());
+      // drivetrain.getModule(1).getDriveMotor().setControl(new CoastOut());
+      // drivetrain.getModule(3).getDriveMotor().setControl(new CoastOut());
+      // drivetrain.getModule(2).getDriveMotor().setControl(new VoltageOut(powerVector.getX() *12));
+      // drivetrain.getModule(2).getSteerMotor().setControl(new PositionVoltage(0).withSlot(0));
+      SmartDashboard.putNumber("stator current back left 11", drivetrain.getModule(2).getDriveMotor().getStatorCurrent().getValueAsDouble());
    }
 
    public void setTargetVector(Vector targetVector) {

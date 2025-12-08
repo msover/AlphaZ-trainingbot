@@ -38,7 +38,7 @@ public class Intake implements Subsystem {
     public void loop() {
         activeIntake.loop();
         storage.loop();
-        pivot.loop();
+        //pivot.loop();
         updateState();
     }
 

@@ -24,19 +24,19 @@ public class Lift implements Subsystem {
     public static double SCORE_LOW_RIGHT = 5.5;
 
     public static double ks = 0;
-    public static double kv = 0; //0.12
-    public static double ka = 0; //0.01
-    public static double kp = 5.5; //13.5
+    public static double kv = 0;
+    public static double ka = 0;
+    public static double kp = 5.5; //5.5
     public static double ki = 0;
-    public static double kd = 0.2;
-    public static double kf = 0.35; //0.35
-    public static double kf_angle = 0.75;
+    public static double kd = 0.2;//0.2
+    public static double kf = 0.4; //0.4
+    public static double kf_angle = 0.85; //0.9
 
     public static double angle = 0;
 
-    public static double vel = 10; //35
-    public static double acc = 2; //150
-    public static double jerk = 5; //1000
+    public static double vel = 10; //10
+    public static double acc = 5; //2
+    public static double jerk = 20; //5
 
     public static double errorThreshold = 0.2;
     public static double timeThresholdTransfer = 1;
