@@ -58,6 +58,8 @@ public class Pivot implements Subsystem {
         //     start = true;
         // }
 
+        setPosition(target);
+
         updateState();
         updateTelemetry();
     }
@@ -66,10 +68,10 @@ public class Pivot implements Subsystem {
         this.pivotState = pivotState;
         switch (pivotState) {
             case UP:
-                setPosition(UP);
+                target = UP;
                 break;
             case DOWN:
-                setPosition(DOWN);
+                target = DOWN;
                 break;
         }
     }
@@ -84,7 +86,6 @@ public class Pivot implements Subsystem {
     }
     
     public void setPosition(double position) {
-        target = position;
         robot.pivotMotor.setMotionMagicPosition(position);
     }
 

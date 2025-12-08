@@ -57,6 +57,6 @@ public class RobotHardware {
     public void loop() {
         drive.loop();
         //intake.loop();
-        outtake.loop();
+        //outtake.loop();
     }
 }

@@ -21,13 +21,13 @@ public class Storage implements Subsystem {
 
     @Override
     public void initialize() {
-        //initTelemetry();
+        initTelemetry();
     }
 
     @Override
     public void loop() {
         updateState();
-        //updateTelemetry();
+        updateTelemetry();
     }
 
     public void setState(StorageState storageState) {
